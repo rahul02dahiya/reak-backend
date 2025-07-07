@@ -1,0 +1,15 @@
+# Node modules
+node_modules/
+
+# SQLite database
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# System files
+.DS_Store

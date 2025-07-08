@@ -3,9 +3,11 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const sequelize = require("./db");
 const User = require("./models/User");
+const cors = require('cors');
 
 const app = express();
 app.use(bodyParser.json());
+app.use(cors());
 
 // Sync User model
 sequelize
@@ -27,7 +29,7 @@ app.get("/api/users", async (req, res) => {
     res.json(users);
   } catch (error) {
     console.log("Error while fetching data : ", error);
-    res.send("Some error occurred, Unable to get data");
+    res.status(400).json(error);
   }
 });
 
@@ -39,7 +41,7 @@ app.get("/api/users/:id", async (req, res) => {
     res.json(user);
   } catch (error) {
     console.log("Error while fetching data : ", error);
-    res.send("Some error occurred");
+    res.status(400).json(error);
   }
 });
 
@@ -50,7 +52,7 @@ app.post("/api/users", async (req, res) => {
     res.status(201).json(user);
   } catch (error) {
     console.log("Error while creating new user : ", error);
-    res.send("Some error occurred");
+    res.status(400).json(error);
   }
 });
 
@@ -63,7 +65,7 @@ app.put("/api/users/:id", async (req, res) => {
     res.status(201).json(user);
   } catch (error) {
     console.log("Error while updating user : ", error);
-    res.send("Some error occurred");
+    res.status(400).json(error);
   }
 });
 
@@ -76,6 +78,6 @@ app.delete("/api/users/:id", async (req, res) => {
         res.status(200).send("User deleted successfully");
       } catch (error) {
         console.log("Error while deleting user : ", error);
-        res.send("Some error occurred");
+        res.status(400).json(error);
       }
 });

@@ -1,9 +1,8 @@
-// app.js
 const express = require("express");
 const bodyParser = require("body-parser");
 const sequelize = require("./db");
 const User = require("./models/User");
-const cors = require('cors');
+const cors = require("cors");
 
 const app = express();
 app.use(bodyParser.json());
@@ -51,7 +50,26 @@ app.post("/api/users", async (req, res) => {
     const user = await User.create(req.body);
     res.status(201).json(user);
   } catch (error) {
-    console.log("Error while creating new user : ", error);
+    if (error.name === "SequelizeUniqueConstraintError") {
+      const field = error.errors[0].path;
+      const msg =
+        field === "email"
+          ? "Email already registered"
+          : field === "mobile"
+          ? "Mobile number already registered"
+          : "Details already registered";
+      return res.status(400).json({ message: msg });
+    }
+    if (error.name === "SequelizeValidationError") {
+      const field = error.errors[0].path;
+      const msg =
+        field === "email"
+          ? "Please enter valid email"
+          : field === "mobile"
+          ? "Please enter valid number"
+          : "Please enter correct details";
+      return res.status(400).json({ message: msg });
+    }
     res.status(400).json(error);
   }
 });
@@ -71,13 +89,13 @@ app.put("/api/users/:id", async (req, res) => {
 
 // Deleting user data
 app.delete("/api/users/:id", async (req, res) => {
-    try {
-        const user = await User.findByPk(parseInt(req.params.id));
-        if (!user) return res.status(404).send("User not found");
-        await user.destroy();
-        res.status(200).send("User deleted successfully");
-      } catch (error) {
-        console.log("Error while deleting user : ", error);
-        res.status(400).json(error);
-      }
+  try {
+    const user = await User.findByPk(parseInt(req.params.id));
+    if (!user) return res.status(404).send("User not found");
+    await user.destroy();
+    res.status(200).send("User deleted successfully");
+  } catch (error) {
+    console.log("Error while deleting user : ", error);
+    res.status(400).json(error);
+  }
 });
